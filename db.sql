@@ -791,117 +791,17 @@ CREATE TABLE `hotelorder` (
 );
 
 INSERT INTO
-    `hotelorder` (
-        `id`,
-        `ordertype`,
-        `start_time`,
-        `end_time`,
-        `rid`,
-        `money`,
-        `order_time`,
-        `register_sid`
+    hotelorder (
+        id,
+        ordertype,
+        start_time,
+        end_time,
+        rid,
+        money,
+        order_time,
+        register_sid
     )
 VALUES (
-        '1',
-        '团队',
-        '2024-06-01',
-        '2024-06-05',
-        '201',
-        '832',
-        '2024-05-29 10:15:00',
-        '1'
-    ),
-    (
-        '2',
-        '团队',
-        '2024-06-10',
-        '2024-06-12',
-        '203',
-        '416',
-        '2024-05-30 09:30:00',
-        '2'
-    ),
-    (
-        '3',
-        '团队',
-        '2024-07-01',
-        '2024-07-03',
-        '301',
-        '416',
-        '2024-05-28 14:20:00',
-        '3'
-    ),
-    (
-        '4',
-        '团队',
-        '2024-08-15',
-        '2024-08-20',
-        '308',
-        '3440',
-        '2024-05-27 08:45:00',
-        '4'
-    ),
-    (
-        '5',
-        '团队',
-        '2024-09-05',
-        '2024-09-10',
-        '402',
-        '1340',
-        '2024-05-27 11:00:00',
-        '5'
-    ),
-    (
-        '6',
-        '团队',
-        '2024-06-01',
-        '2024-06-05',
-        '205',
-        '1072',
-        '2024-05-30 10:20:00',
-        '6'
-    ),
-    (
-        '7',
-        '团队',
-        '2024-07-10',
-        '2024-07-15',
-        '207',
-        '1340',
-        '2024-05-28 16:45:00',
-        '7'
-    ),
-    (
-        '8',
-        '团队',
-        '2024-06-20',
-        '2024-06-25',
-        '305',
-        '1290',
-        '2024-05-29 12:00:00',
-        '8'
-    ),
-    (
-        '9',
-        '团队',
-        '2024-08-01',
-        '2024-08-05',
-        '307',
-        '1040',
-        '2024-05-30 14:30:00',
-        '9'
-    ),
-    (
-        '10',
-        '团队',
-        '2024-07-15',
-        '2024-07-18',
-        '303',
-        '774',
-        '2024-05-28 17:10:00',
-        '10'
-    ),
-    (
         '21',
         '个体',
         '2024-06-01',
@@ -1030,7 +930,8 @@ SELECT Sid, Sname, Susername
 FROM Staff
 WHERE
     Srole > 1
--- 创建入住时更新房间状态的触发器
+    -- 创建入住时更新房间状态的触发器
+
 DELIMITER $$
 
 CREATE TRIGGER UpdateRoomStatusOnCheckIn
@@ -1058,8 +959,60 @@ BEGIN
     END IF;
 END$$
 
+ALTER TABLE hotelorder MODIFY COLUMN id INT AUTO_INCREMENT;
+
+---------------------------------------
+DELIMITER $$
+
+CREATE TRIGGER after_insert_booking_client
+AFTER INSERT ON booking_client
+FOR EACH ROW
+BEGIN
+DECLARE roomPrice DECIMAL(10, 2);
+    DECLARE daysBooked INT;
+    DECLARE totalCost DECIMAL(10, 2);
+
+    SELECT rprice INTO roomPrice FROM room WHERE rid = NEW.rid;
+    SET daysBooked = DATEDIFF(NEW.end_time, NEW.start_time);
+    SET totalCost = roomPrice * daysBooked;
+    INSERT INTO hotelorder (ordertype, start_time, end_time, rid, money, order_time,register_sid)
+    VALUES ('预约', NEW.start_time, NEW.end_time, NEW.rid, totalCost,NEW.booking_time ,NULL);
+END$$
+
+CREATE TRIGGER after_insert_booking_team
+AFTER INSERT ON booking_team
+FOR EACH ROW
+BEGIN
+DECLARE roomPrice DECIMAL(10, 2);
+    DECLARE daysBooked INT;
+    DECLARE totalCost DECIMAL(10, 2);
+
+    SELECT rprice INTO roomPrice FROM room WHERE rid = NEW.rid;
+    SET daysBooked = DATEDIFF(NEW.end_time, NEW.start_time);
+    SET totalCost = roomPrice * daysBooked;
+    INSERT INTO hotelorder (ordertype, start_time, end_time, rid, money, order_time,register_sid)
+    VALUES ('预约', NEW.start_time, NEW.end_time, NEW.rid, totalCost, NEW.booking_time,NULL);
+END$$
+
+CREATE TRIGGER after_insert_checkin_client
+AFTER INSERT ON checkin_client
+FOR EACH ROW
+BEGIN
+    INSERT INTO hotelorder (ordertype, start_time, end_time, rid, money, order_time,register_sid)
+    VALUES ('前台登记', NEW.start_time, NEW.end_time, NEW.rid, NEW.total_price, NOW(),NEW.check_in_sid);
+END$$
+
+CREATE TRIGGER after_insert_checkin_team
+AFTER INSERT ON checkin_team
+FOR EACH ROW
+BEGIN
+    INSERT INTO hotelorder (ordertype, start_time, end_time, rid, money, order_time,register_sid)
+    VALUES ('前台登记', NEW.start_time, NEW.end_time, NEW.rid, NEW.total_price, NOW(),NEW.check_in_sid);
+END$$
+
 DELIMITER;
 
+DELIMITER;
 --客户电话号码索引：加快通过电话号码查询客户信息的速度
 CREATE INDEX idx_cphone ON client (cphone);
 
@@ -1068,6 +1021,7 @@ CREATE INDEX idx_rprice ON room (rprice);
 
 --为状态字段添加索引可能会有助于快速筛选
 CREATE INDEX idx_rstatus ON room (rstatus);
+
 --根据入住日期、预订日期或注册时间来查询数据
 CREATE INDEX idx_start_time ON booking_client (start_time);
 
