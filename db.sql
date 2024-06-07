@@ -1,8 +1,8 @@
-CREATE DATABASE `HotelSystem` DEFAULT CHARACTER SET = 'utf8mb4';
+CREATE DATABASE `HotelSystemplus` DEFAULT CHARACTER SET = 'utf8mb4';
 
 SHOW DATABASES;
 
-USE HotelSystem;
+USE HotelSystemplus;
 
 CREATE TABLE `room` (
     `rid` VARCHAR(255) NOT NULL,
@@ -382,525 +382,487 @@ VALUES (
         '2020-01-07 09:25:37'
     );
 
-CREATE TABLE `booking_client` (
-    `cid` varchar(255) NOT NULL,
-    `rid` varchar(255) NOT NULL,
+-----------改进-------------
+-- 创建新的 booking 表
+CREATE TABLE `booking` (
+    `booking_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `type` ENUM('individual', 'team') NOT NULL,
+    `client_or_team_id` VARCHAR(255) NOT NULL,
+    `room_id` VARCHAR(255) NOT NULL,
     `start_time` DATE DEFAULT NULL,
     `end_time` DATE DEFAULT NULL,
     `booking_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`cid`, `rid`),
-    KEY `rid` (`rid`),
-    CONSTRAINT `booking_client_ibfk_1` FOREIGN KEY (`cid`) REFERENCES `client` (`cid`),
-    CONSTRAINT `booking_client_ibfk_2` FOREIGN KEY (`rid`) REFERENCES `room` (`rid`)
+    `register_sid` VARCHAR(255) DEFAULT NULL,
+    FOREIGN KEY (`room_id`) REFERENCES `room` (`rid`),
+    FOREIGN KEY (`register_sid`) REFERENCES `staff` (`sid`)
 );
 
 INSERT INTO
-    `booking_client` (
-        `cid`,
-        `rid`,
+    `booking` (
+        `type`,
+        `client_or_team_id`,
+        `room_id`,
         `start_time`,
         `end_time`,
-        `booking_time`
+        `booking_time`,
+        `register_sid`
     )
 VALUES (
+        'individual',
         '130898199212233434',
         '201',
         '2024-06-01',
         '2024-06-05',
-        '2024-05-29 10:15:00'
-    ),
-    (
-        '131989238123991309',
-        '203',
-        '2024-06-10',
-        '2024-06-12',
-        '2024-05-30 09:30:00'
-    ),
-    (
-        '189322199312262232',
-        '301',
-        '2024-07-01',
-        '2024-07-03',
-        '2024-05-28 14:20:00'
-    ),
-    (
-        '289193212393128999',
-        '308',
-        '2024-08-15',
-        '2024-08-20',
-        '2024-05-27 08:45:00'
-    ),
-    (
-        '290389199412280303',
-        '402',
-        '2024-09-05',
-        '2024-09-10',
-        '2024-05-27 11:00:00'
-    ),
-    (
-        '320198199812243456',
-        '205',
-        '2024-06-06',
-        '2024-06-10',
-        '2024-05-30 10:20:00'
-    ),
-    (
-        '320222199102036712',
-        '207',
-        '2024-07-10',
-        '2024-07-15',
-        '2024-05-28 16:45:00'
-    ),
-    (
-        '320678199012243333',
-        '305',
-        '2024-06-20',
-        '2024-06-25',
-        '2024-05-29 12:00:00'
-    ),
-    (
-        '320876196510200099',
-        '307',
-        '2024-08-21',
-        '2024-08-25',
-        '2024-05-30 14:30:00'
-    ),
-    (
-        '320897189722334567',
-        '303',
-        '2024-07-15',
-        '2024-07-18',
-        '2024-05-28 17:10:00'
-    );
-
-CREATE TABLE `booking_team` (
-    `tid` varchar(255) NOT NULL,
-    `rid` varchar(255) NOT NULL,
-    `start_time` DATE DEFAULT NULL,
-    `end_time` DATE DEFAULT NULL,
-    `booking_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`tid`, `rid`),
-    KEY `rid` (`rid`),
-    CONSTRAINT `booking_team_ibfk_1` FOREIGN KEY (`tid`) REFERENCES `team` (`tid`),
-    CONSTRAINT `booking_team_ibfk_2` FOREIGN KEY (`rid`) REFERENCES `room` (`rid`)
-);
-
-INSERT INTO
-    `booking_team` (
-        `tid`,
-        `rid`,
-        `start_time`,
-        `end_time`,
-        `booking_time`
-    )
-VALUES (
-        '1',
-        '301',
-        '2024-06-01',
-        '2024-06-05',
-        '2024-05-29 10:15:00'
-    ),
-    (
-        '11',
-        '303',
-        '2024-06-10',
-        '2024-06-12',
-        '2024-05-30 09:30:00'
-    ),
-    (
-        '16',
-        '305',
-        '2024-07-01',
-        '2024-07-03',
-        '2024-05-28 14:20:00'
-    ),
-    (
-        '30',
-        '307',
-        '2024-08-15',
-        '2024-08-20',
-        '2024-05-27 08:45:00'
-    ),
-    (
-        '32',
-        '308',
-        '2024-09-05',
-        '2024-09-10',
-        '2024-05-27 11:00:00'
-    ),
-    (
-        '43',
-        '201',
-        '2024-06-06',
-        '2024-06-10',
-        '2024-05-30 10:20:00'
-    ),
-    (
-        '55',
-        '203',
-        '2024-07-10',
-        '2024-07-15',
-        '2024-05-28 16:45:00'
-    ),
-    (
-        '7',
-        '205',
-        '2024-06-20',
-        '2024-06-25',
-        '2024-05-29 12:00:00'
-    ),
-    (
-        '8',
-        '207',
-        '2024-08-21',
-        '2024-08-25',
-        '2024-05-30 14:30:00'
-    ),
-    (
-        '9',
-        '402',
-        '2024-07-15',
-        '2024-07-18',
-        '2024-05-28 17:10:00'
-    );
-
-CREATE TABLE `checkin_client` (
-    `rid` varchar(255) NOT NULL,
-    `cid` varchar(255) NOT NULL,
-    `start_time` DATE DEFAULT NULL,
-    `end_time` DATE DEFAULT NULL,
-    `total_price` varchar(255) DEFAULT NULL,
-    `check_in_sid` varchar(255) DEFAULT NULL,
-    PRIMARY KEY (`rid`, `cid`),
-    KEY `cid` (`cid`),
-    KEY `check_in_sid` (`check_in_sid`),
-    CONSTRAINT `checkin_client_ibfk_1` FOREIGN KEY (`rid`) REFERENCES `room` (`rid`),
-    CONSTRAINT `checkin_client_ibfk_2` FOREIGN KEY (`cid`) REFERENCES `client` (`cid`),
-    CONSTRAINT `checkin_client_ibfk_3` FOREIGN KEY (`check_in_sid`) REFERENCES `staff` (`sid`)
-);
-
-INSERT INTO
-    `checkin_client` (
-        `rid`,
-        `cid`,
-        `start_time`,
-        `end_time`,
-        `total_price`,
-        `check_in_sid`
-    )
-VALUES (
-        '201',
-        '130898199212233434',
-        '2024-06-01',
-        '2024-06-05',
-        '832',
-        '1'
-    ),
-    (
-        '203',
-        '131989238123991309',
-        '2024-06-10',
-        '2024-06-12',
-        '416',
-        '2'
-    ),
-    (
-        '301',
-        '189322199312262232',
-        '2024-07-01',
-        '2024-07-03',
-        '416',
-        '3'
-    ),
-    (
-        '308',
-        '289193212393128999',
-        '2024-08-15',
-        '2024-08-20',
-        '3440',
-        '4'
-    ),
-    (
-        '402',
-        '290389199412280303',
-        '2024-09-05',
-        '2024-09-10',
-        '1340',
-        '5'
-    ),
-    (
-        '205',
-        '320198199812243456',
-        '2024-06-06',
-        '2024-06-10',
-        '1072',
-        '6'
-    ),
-    (
-        '207',
-        '320222199102036712',
-        '2024-07-10',
-        '2024-07-15',
-        '1340',
-        '7'
-    ),
-    (
-        '305',
-        '320678199012243333',
-        '2024-06-20',
-        '2024-06-25',
-        '1290',
-        '8'
-    ),
-    (
-        '307',
-        '320876196510200099',
-        '2024-08-21',
-        '2024-08-25',
-        '1040',
-        '9'
-    ),
-    (
-        '303',
-        '320897189722334567',
-        '2024-07-15',
-        '2024-07-18',
-        '774',
-        '10'
-    );
-
-CREATE TABLE `checkin_team` (
-    `rid` varchar(255) NOT NULL,
-    `tid` varchar(255) NOT NULL,
-    `start_time` DATE DEFAULT NULL,
-    `end_time` DATE DEFAULT NULL,
-    `total_price` varchar(255) DEFAULT NULL,
-    `check_in_sid` varchar(255) DEFAULT NULL,
-    PRIMARY KEY (`rid`, `tid`),
-    KEY `teamsid` (`check_in_sid`),
-    KEY `teamtid` (`tid`),
-    CONSTRAINT `teamrid` FOREIGN KEY (`rid`) REFERENCES `room` (`rid`),
-    CONSTRAINT `teamsid` FOREIGN KEY (`check_in_sid`) REFERENCES `staff` (`sid`),
-    CONSTRAINT `teamtid` FOREIGN KEY (`tid`) REFERENCES `team` (`tid`)
-);
-
-INSERT INTO
-    `checkin_team` (
-        `rid`,
-        `tid`,
-        `start_time`,
-        `end_time`,
-        `total_price`,
-        `check_in_sid`
-    )
-VALUES (
-        '301',
-        '1',
-        '2024-06-01',
-        '2024-06-05',
-        '832',
-        '1'
-    ),
-    (
-        '303',
-        '11',
-        '2024-06-10',
-        '2024-06-12',
-        '416',
-        '2'
-    ),
-    (
-        '305',
-        '16',
-        '2024-07-01',
-        '2024-07-03',
-        '416',
-        '3'
-    ),
-    (
-        '307',
-        '30',
-        '2024-08-15',
-        '2024-08-20',
-        '3440',
-        '4'
-    ),
-    (
-        '308',
-        '32',
-        '2024-09-05',
-        '2024-09-10',
-        '3440',
-        '5'
-    ),
-    (
-        '201',
-        '43',
-        '2024-06-06',
-        '2024-06-10',
-        '1072',
-        '6'
-    ),
-    (
-        '203',
-        '55',
-        '2024-07-10',
-        '2024-07-15',
-        '1340',
-        '7'
-    ),
-    (
-        '205',
-        '7',
-        '2024-06-20',
-        '2024-06-25',
-        '1290',
-        '8'
-    ),
-    (
-        '207',
-        '8',
-        '2024-08-21',
-        '2024-08-25',
-        '1040',
-        '9'
-    ),
-    (
-        '402',
-        '9',
-        '2024-07-15',
-        '2024-07-18',
-        '774',
-        '10'
-    );
-
-CREATE TABLE `hotelorder` (
-    `id` varchar(255) NOT NULL,
-    `ordertype` varchar(255) NOT NULL,
-    `start_time` DATE NOT NULL,
-    `end_time` DATE NOT NULL,
-    `rid` varchar(255) NOT NULL,
-    `money` varchar(255) DEFAULT NULL,
-    `order_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `register_sid` varchar(255) DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    KEY `rid` (`rid`),
-    KEY `register_sid` (`register_sid`),
-    CONSTRAINT `hotelorder_ibfk_1` FOREIGN KEY (`rid`) REFERENCES `room` (`rid`),
-    CONSTRAINT `hotelorder_ibfk_2` FOREIGN KEY (`register_sid`) REFERENCES `staff` (`sid`)
-);
-
-INSERT INTO
-    hotelorder (
-        id,
-        ordertype,
-        start_time,
-        end_time,
-        rid,
-        money,
-        order_time,
-        register_sid
-    )
-VALUES (
-        '21',
-        '个体',
-        '2024-06-01',
-        '2024-06-05',
-        '201',
-        '832',
         '2024-05-29 10:15:00',
         '1'
     ),
     (
-        '22',
-        '个体',
+        'individual',
+        '131989238123991309',
+        '203',
         '2024-06-10',
         '2024-06-12',
-        '203',
-        '416',
         '2024-05-30 09:30:00',
         '2'
     ),
     (
-        '23',
-        '个体',
+        'individual',
+        '189322199312262232',
+        '301',
         '2024-07-01',
         '2024-07-03',
-        '301',
-        '416',
         '2024-05-28 14:20:00',
         '3'
     ),
     (
-        '24',
-        '个体',
+        'individual',
+        '289193212393128999',
+        '308',
         '2024-08-15',
         '2024-08-20',
-        '308',
-        '3440',
         '2024-05-27 08:45:00',
         '4'
     ),
     (
-        '25',
-        '个体',
+        'individual',
+        '290389199412280303',
+        '402',
         '2024-09-05',
         '2024-09-10',
-        '402',
-        '1340',
         '2024-05-27 11:00:00',
         '5'
     ),
     (
-        '26',
-        '团队',
+        'individual',
+        '320198199812243456',
+        '205',
         '2024-06-06',
         '2024-06-10',
+        '2024-05-30 10:20:00',
+        '6'
+    ),
+    (
+        'individual',
+        '320222199102036712',
+        '207',
+        '2024-07-10',
+        '2024-07-15',
+        '2024-05-28 16:45:00',
+        '7'
+    ),
+    (
+        'individual',
+        '320678199012243333',
+        '305',
+        '2024-06-20',
+        '2024-06-25',
+        '2024-05-29 12:00:00',
+        '8'
+    ),
+    (
+        'individual',
+        '320876196510200099',
+        '307',
+        '2024-08-21',
+        '2024-08-25',
+        '2024-05-30 14:30:00',
+        '9'
+    ),
+    (
+        'individual',
+        '320897189722334567',
+        '303',
+        '2024-07-15',
+        '2024-07-18',
+        '2024-05-28 17:10:00',
+        '10'
+    ),
+    (
+        'team',
+        '1',
         '301',
-        '832',
+        '2024-06-06',
+        '2024-06-10',
         '2024-05-29 10:15:00',
         '1'
     ),
     (
-        '27',
-        '团队',
+        'team',
+        '1',
+        '303',
         '2024-06-11',
         '2024-06-15',
-        '303',
-        '416',
         '2024-05-30 09:30:00',
         '2'
     ),
     (
-        '28',
-        '团队',
+        'team',
+        '16',
+        '305',
         '2024-07-04',
         '2024-07-08',
-        '305',
-        '416',
         '2024-05-28 14:20:00',
         '3'
     ),
     (
-        '29',
-        '团队',
+        'team',
+        '16',
+        '307',
         '2024-08-26',
         '2024-08-30',
-        '307',
-        '3440',
         '2024-05-27 08:45:00',
         '4'
     ),
     (
-        '30',
-        '团队',
+        'team',
+        '32',
+        '201',
         '2024-09-11',
         '2024-09-15',
-        '308',
-        '1340',
-        '2024-05-27 11:00:00',
+        '2024-05-30 10:20:00',
         '5'
+    ),
+    (
+        'team',
+        '32',
+        '203',
+        '2024-09-11',
+        '2024-09-15',
+        '2024-05-28 16:45:00',
+        '6'
+    ),
+    (
+        'team',
+        '32',
+        '308',
+        '2024-09-11',
+        '2024-09-15',
+        '2024-05-27 11:00:00',
+        '7'
+    ),
+    (
+        'team',
+        '7',
+        '205',
+        '2024-06-21',
+        '2024-06-25',
+        '2024-05-29 12:00:00',
+        '8'
+    ),
+    (
+        'team',
+        '7',
+        '207',
+        '2024-06-21',
+        '2024-06-25',
+        '2024-05-30 14:30:00',
+        '9'
+    ),
+    (
+        'team',
+        '7',
+        '402',
+        '2024-09-11',
+        '2024-09-15',
+        '2024-05-28 17:10:00',
+        '10'
     );
+
+-- 更新触发器以适应新的 booking 表
+DELIMITER $$
+
+CREATE TRIGGER after_insert_booking
+AFTER INSERT ON booking
+FOR EACH ROW
+BEGIN
+    DECLARE roomPrice DECIMAL(10, 2);
+    DECLARE daysBooked INT;
+    DECLARE totalCost DECIMAL(10, 2);
+
+    SELECT rprice INTO roomPrice FROM room WHERE rid = NEW.room_id;
+    SET daysBooked = DATEDIFF(NEW.end_time, NEW.start_time);
+    SET totalCost = roomPrice * daysBooked;
+    
+    INSERT INTO hotelorder (ordertype, start_time, end_time, rid, money, order_time, register_sid)
+    VALUES ('预约', NEW.start_time, NEW.end_time, NEW.room_id, totalCost, NEW.booking_time, NEW.register_sid);
+END$$
+
+DELIMITER;
+
+--验证触发器是否被激活---
+SHOW TRIGGERS LIKE 'booking';
+
+----------------------------
+
+CREATE TABLE `checkin` (
+    `checkin_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `type` ENUM('individual', 'team') NOT NULL,
+    `client_or_team_id` VARCHAR(255) NOT NULL,
+    `room_id` VARCHAR(255) NOT NULL,
+    `start_time` DATE DEFAULT NULL,
+    `end_time` DATE DEFAULT NULL,
+    `total_price` DECIMAL(10, 2) DEFAULT NULL,
+    `check_in_sid` VARCHAR(255) DEFAULT NULL,
+    FOREIGN KEY (`room_id`) REFERENCES `room` (`rid`),
+    FOREIGN KEY (`check_in_sid`) REFERENCES `staff` (`sid`)
+);
+
+INSERT INTO
+    `checkin` (
+        `type`,
+        `client_or_team_id`,
+        `room_id`,
+        `start_time`,
+        `end_time`,
+        `total_price`,
+        `check_in_sid`
+    )
+VALUES
+    -- 插入调整后的个人入住数据
+    (
+        'individual',
+        '130898199212233434',
+        '201',
+        '2024-06-06',
+        '2024-06-10',
+        832,
+        '1'
+    ),
+    (
+        'individual',
+        '131989238123991309',
+        '203',
+        '2024-06-13',
+        '2024-06-17',
+        416,
+        '2'
+    ),
+    (
+        'individual',
+        '189322199312262232',
+        '301',
+        '2024-07-04',
+        '2024-07-08',
+        416,
+        '3'
+    ),
+    (
+        'individual',
+        '289193212393128999',
+        '308',
+        '2024-08-21',
+        '2024-08-25',
+        3440,
+        '4'
+    ),
+    (
+        'individual',
+        '290389199412280303',
+        '402',
+        '2024-09-11',
+        '2024-09-15',
+        1340,
+        '5'
+    ),
+    (
+        'individual',
+        '320198199812243456',
+        '205',
+        '2024-06-11',
+        '2024-06-15',
+        1072,
+        '6'
+    ),
+    (
+        'individual',
+        '320222199102036712',
+        '207',
+        '2024-07-16',
+        '2024-07-20',
+        1340,
+        '7'
+    ),
+    (
+        'individual',
+        '320678199012243333',
+        '305',
+        '2024-06-26',
+        '2024-06-30',
+        1290,
+        '8'
+    ),
+    (
+        'individual',
+        '320876196510200099',
+        '307',
+        '2024-08-26',
+        '2024-08-30',
+        1040,
+        '9'
+    ),
+    (
+        'individual',
+        '320897189722334567',
+        '303',
+        '2024-07-19',
+        '2024-07-23',
+        774,
+        '10'
+    ),
+    -- 插入调整后的团队入住数据
+    (
+        'team',
+        '1',
+        '301',
+        '2024-06-11',
+        '2024-06-15',
+        832,
+        '1'
+    ),
+    (
+        'team',
+        '11',
+        '303',
+        '2024-06-16',
+        '2024-06-20',
+        416,
+        '2'
+    ),
+    (
+        'team',
+        '16',
+        '305',
+        '2024-07-09',
+        '2024-07-13',
+        416,
+        '3'
+    ),
+    (
+        'team',
+        '30',
+        '307',
+        '2024-08-26',
+        '2024-08-30',
+        3440,
+        '4'
+    ),
+    (
+        'team',
+        '32',
+        '308',
+        '2024-09-11',
+        '2024-09-15',
+        3440,
+        '5'
+    ),
+    (
+        'team',
+        '43',
+        '201',
+        '2024-06-11',
+        '2024-06-15',
+        1072,
+        '6'
+    ),
+    (
+        'team',
+        '55',
+        '203',
+        '2024-07-16',
+        '2024-07-20',
+        1340,
+        '7'
+    ),
+    (
+        'team',
+        '7',
+        '205',
+        '2024-06-26',
+        '2024-06-30',
+        1290,
+        '8'
+    ),
+    (
+        'team',
+        '7',
+        '207',
+        '2024-06-26',
+        '2024-06-30',
+        1040,
+        '9'
+    ),
+    (
+        'team',
+        '9',
+        '402',
+        '2024-07-19',
+        '2024-07-23',
+        774,
+        '10'
+    );
+
+CREATE TABLE IF NOT EXISTS `hotelorder` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `ordertype` VARCHAR(255) NOT NULL,
+    `start_time` DATE NOT NULL,
+    `end_time` DATE NOT NULL,
+    `rid` VARCHAR(255) NOT NULL,
+    `money` DECIMAL(10, 2) DEFAULT NULL,
+    `order_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `register_sid` VARCHAR(255) DEFAULT NULL,
+    FOREIGN KEY (`rid`) REFERENCES `room` (`rid`),
+    FOREIGN KEY (`register_sid`) REFERENCES `staff` (`sid`)
+);
+
+-----触发器-----
+DELIMITER $$
+
+CREATE TRIGGER after_insert_checkin
+AFTER INSERT ON checkin
+FOR EACH ROW
+BEGIN
+    -- 更新房间状态为占用
+    UPDATE room
+    SET rstatus = '占用'
+    WHERE rid = NEW.room_id;
+
+    -- 插入订单到 hotelorder 表
+    INSERT INTO hotelorder (ordertype, start_time, end_time, rid, money, order_time, register_sid)
+    VALUES ('前台登记', NEW.start_time, NEW.end_time, NEW.room_id, NEW.total_price, NOW(), NEW.check_in_sid);
+END$$
+
+CREATE TRIGGER after_update_checkin
+AFTER UPDATE ON checkin
+FOR EACH ROW
+BEGIN
+    IF NEW.end_time < CURRENT_DATE THEN
+        UPDATE room
+        SET rstatus = '空闲'
+        WHERE rid = NEW.room_id;
+    END IF;
+END$$
+
+DELIMITER;
 
 DROP VIEW IF EXISTS `Customers`;
 
@@ -916,12 +878,12 @@ DROP VIEW IF EXISTS `Living`;
 
 CREATE VIEW Living AS
 SELECT
-    Rid,
-    Cid,
+    checkin_id,
+    client_or_team_id,
     start_time,
     end_time,
     total_price
-FROM checkin_client;
+FROM checkin;
 
 DROP VIEW IF EXISTS `Administrators`;
 
@@ -930,199 +892,134 @@ SELECT Sid, Sname, Susername
 FROM Staff
 WHERE
     Srole > 1
-    -- 创建入住时更新房间状态的触发器
 
 DELIMITER $$
 
 CREATE TRIGGER UpdateRoomStatusOnCheckIn
-AFTER INSERT ON checkin_client
+AFTER INSERT ON checkin
 FOR EACH ROW
 BEGIN
     UPDATE room
     SET rstatus = '占用'
-    WHERE rid = NEW.rid;
+    WHERE rid = NEW.room_id;
 END$$
 
-DELIMITER;
-
--- 创建退房时更新房间状态的触发器
-DELIMITER $$
-
 CREATE TRIGGER UpdateRoomStatusOnCheckOut
-AFTER UPDATE ON checkin_client
+AFTER UPDATE ON checkin
 FOR EACH ROW
 BEGIN
     IF NEW.end_time < CURRENT_DATE THEN
         UPDATE room
         SET rstatus = '空闲'
-        WHERE rid = NEW.rid;
+        WHERE rid = NEW.room_id;
     END IF;
 END$$
 
-ALTER TABLE hotelorder MODIFY COLUMN id INT AUTO_INCREMENT;
-
----------------------------------------
-DELIMITER $$
-
-CREATE TRIGGER after_insert_booking_client
-AFTER INSERT ON booking_client
-FOR EACH ROW
-BEGIN
-DECLARE roomPrice DECIMAL(10, 2);
-    DECLARE daysBooked INT;
-    DECLARE totalCost DECIMAL(10, 2);
-
-    SELECT rprice INTO roomPrice FROM room WHERE rid = NEW.rid;
-    SET daysBooked = DATEDIFF(NEW.end_time, NEW.start_time);
-    SET totalCost = roomPrice * daysBooked;
-    INSERT INTO hotelorder (ordertype, start_time, end_time, rid, money, order_time,register_sid)
-    VALUES ('预约', NEW.start_time, NEW.end_time, NEW.rid, totalCost,NEW.booking_time ,NULL);
-END$$
-
-CREATE TRIGGER after_insert_booking_team
-AFTER INSERT ON booking_team
-FOR EACH ROW
-BEGIN
-DECLARE roomPrice DECIMAL(10, 2);
-    DECLARE daysBooked INT;
-    DECLARE totalCost DECIMAL(10, 2);
-
-    SELECT rprice INTO roomPrice FROM room WHERE rid = NEW.rid;
-    SET daysBooked = DATEDIFF(NEW.end_time, NEW.start_time);
-    SET totalCost = roomPrice * daysBooked;
-    INSERT INTO hotelorder (ordertype, start_time, end_time, rid, money, order_time,register_sid)
-    VALUES ('预约', NEW.start_time, NEW.end_time, NEW.rid, totalCost, NEW.booking_time,NULL);
-END$$
-
-CREATE TRIGGER after_insert_checkin_client
-AFTER INSERT ON checkin_client
-FOR EACH ROW
-BEGIN
-    INSERT INTO hotelorder (ordertype, start_time, end_time, rid, money, order_time,register_sid)
-    VALUES ('前台登记', NEW.start_time, NEW.end_time, NEW.rid, NEW.total_price, NOW(),NEW.check_in_sid);
-END$$
-
-CREATE TRIGGER after_insert_checkin_team
-AFTER INSERT ON checkin_team
-FOR EACH ROW
-BEGIN
-    INSERT INTO hotelorder (ordertype, start_time, end_time, rid, money, order_time,register_sid)
-    VALUES ('前台登记', NEW.start_time, NEW.end_time, NEW.rid, NEW.total_price, NOW(),NEW.check_in_sid);
-END$$
-
 DELIMITER;
 
-DELIMITER;
 --客户电话号码索引：加快通过电话号码查询客户信息的速度
 CREATE INDEX idx_cphone ON client (cphone);
-
 --房间价格索索引：加快通过价格查询房间的速度
 CREATE INDEX idx_rprice ON room (rprice);
-
 --为状态字段添加索引可能会有助于快速筛选
 CREATE INDEX idx_rstatus ON room (rstatus);
-
 --根据入住日期、预订日期或注册时间来查询数据
-CREATE INDEX idx_start_time ON booking_client (start_time);
+CREATE INDEX idx_booking_start_time ON booking (start_time);
 
-CREATE INDEX idx_end_time ON booking_client (end_time);
+CREATE INDEX idx_booking_end_time ON booking (end_time);
 
-CREATE INDEX idx_register_time ON client (register_time);
+CREATE INDEX idx_client_register_time ON client (register_time);
+
+CREATE INDEX idx_checkin_start_time ON checkin (start_time);
+
+CREATE INDEX idx_checkin_end_time ON checkin (end_time);
 
 --创建员工账号
-CREATE USER 'ranxi' @'%' IDENTIFIED BY '123456';
+CREATE USER 'ranxi' @'localhost' IDENTIFIED BY '123456';
 
-CREATE USER 'zs123' @'%' IDENTIFIED BY '123456';
+CREATE USER 'zs123' @'localhost' IDENTIFIED BY '123456';
 
-CREATE USER 'ls123' @'%' IDENTIFIED BY '123456';
+CREATE USER 'ls123' @'localhost' IDENTIFIED BY '123456';
 
-CREATE USER 'zl123' @'%' IDENTIFIED BY '123456';
+CREATE USER 'zl123' @'localhost' IDENTIFIED BY '123456';
 
-CREATE USER 'wang123' @'%' IDENTIFIED BY '123456';
+CREATE USER 'wang123' @'localhost' IDENTIFIED BY '123456';
 
-CREATE USER 'hq123' @'%' IDENTIFIED BY '123456';
+CREATE USER 'hq123' @'localhost' IDENTIFIED BY '123456';
 
-CREATE USER 'oyy123' @'%' IDENTIFIED BY '123456';
+CREATE USER 'oyy123' @'localhost' IDENTIFIED BY '123456';
 
-CREATE USER 'jack123' @'%' IDENTIFIED BY '123456';
+CREATE USER 'jack123' @'localhost' IDENTIFIED BY '123456';
 
-CREATE USER 'lucy123' @'%' IDENTIFIED BY '123456';
+CREATE USER 'lucy123' @'localhost' IDENTIFIED BY '123456';
 
-CREATE USER 'tom123' @'%' IDENTIFIED BY '123456';
-
---授予员工权限
-GRANT Level1_Staff TO 'zs123' @'%';
-
-GRANT Level1_Staff TO 'ls123' @'%';
-
-GRANT Level1_Staff TO 'zl123' @'%';
-
-GRANT Level1_Staff TO 'wang123' @'%';
-
-GRANT Level1_Staff TO 'hq123' @'%';
-
-GRANT Level1_Staff TO 'jack123' @'%';
-
-GRANT Level1_Staff TO 'lucy123' @'%';
-
-GRANT Level2_Staff TO 'ranxi' @'%';
-
-GRANT Level2_Staff TO 'oyy123' @'%';
-
-GRANT Level2_Staff TO 'tom123' @'%';
+CREATE USER 'tom123' @'localhost' IDENTIFIED BY '123456';
 
 -- 创建1级权限员工角色
-CREATE ROLE Level1_Staff;
+CREATE ROLE Level1_Staff @'localhost';
 
--- 授予更新权限
-GRANT UPDATE ON hotelsystem.booking_client TO Level1_Staff;
+-- 1级权限员工角色权限
+GRANT SELECT ON hotelsystemplus.* TO Level1_Staff;
 
-GRANT UPDATE ON hotelsystem.booking_team TO Level1_Staff;
+GRANT
+INSERT
+,
+UPDATE,
+DELETE ON HotelSystemplus.room TO Level1_Staff;
 
-GRANT UPDATE ON hotelsystem.checkin_client TO Level1_Staff;
+GRANT
+INSERT
+,
+UPDATE,
+DELETE ON HotelSystemplus.checkin TO Level1_Staff;
 
-GRANT UPDATE ON hotelsystem.checkin_team TO Level1_Staff;
+GRANT
+INSERT
+,
+UPDATE,
+DELETE ON HotelSystemplus.client TO Level1_Staff;
 
--- 授予查询权限
-GRANT SELECT ON hotelsystem.client TO Level1_Staff;
+GRANT
+INSERT
+,
+UPDATE,
+DELETE ON HotelSystemplus.booking TO Level1_Staff;
 
-GRANT SELECT ON hotelsystem.room TO Level1_Staff;
-
-GRANT SELECT ON hotelsystem.team TO Level1_Staff;
-
-GRANT SELECT ON hotelsystem.hotelorder TO Level1_Staff;
+GRANT
+INSERT
+,
+UPDATE,
+DELETE ON HotelSystemplus.team TO Level1_Staff;
 
 -- 创建2级权限员工角色
 CREATE ROLE Level2_Staff;
 
--- 授予更新、删除和选择权限
-GRANT SELECT, UPDATE, DELETE ON hotelsystem.staff TO Level2_Staff;
+-- 2级权限员工角色权限
+GRANT ALL PRIVILEGES ON HotelSystemplus.* TO Level2_Staff;
 
-GRANT SELECT, UPDATE, DELETE ON hotelsystem.room TO Level2_Staff;
+--激活所有角色权限
+SET global activate_all_roles_on_login = ON;
 
--- 授予投放、更新、删除和选择权限
-GRANT
-SELECT,
-UPDATE, DELETE,
-DROP ON hotelsystem.client TO Level2_Staff;
+-- 为1级权限员工分配角色
+GRANT Level1_Staff TO 'zs123' @'localhost';
 
-GRANT
-SELECT,
-UPDATE, DELETE,
-DROP ON hotelsystem.team TO Level2_Staff;
+GRANT Level1_Staff TO 'ls123' @'localhost';
 
--- 授予更新、选择、投放和删除权限
-GRANT
-SELECT,
-UPDATE, DELETE,
-DROP ON hotelsystem.hotelorder TO Level2_Staff;
+GRANT Level1_Staff TO 'zl123' @'localhost';
 
-GRANT
-SELECT,
-UPDATE, DELETE,
-DROP ON hotelsystem.booking_client TO Level2_Staff;
+GRANT Level1_Staff TO 'wang123' @'localhost';
 
-GRANT
-SELECT,
-UPDATE, DELETE,
-DROP ON hotelsystem.booking_team TO Level2_Staff;
+GRANT Level1_Staff TO 'hq123' @'localhost';
+
+GRANT Level1_Staff TO 'jack123' @'localhost';
+
+GRANT Level1_Staff TO 'lucy123' @'localhost';
+
+-- 为2级权限员工分配角色
+GRANT Level2_Staff TO 'ranxi' @'%';
+
+GRANT Level2_Staff TO 'tom123' @'localhost';
+
+GRANT Level2_Staff TO 'oyy123' @'localhost';
+
+FLUSH PRIVILEGES;
