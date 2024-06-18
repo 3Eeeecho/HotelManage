@@ -588,6 +588,25 @@ VALUES (
         '10'
     );
 
+INSERT INTO
+    `booking` (
+        `type`,
+        `client_or_team_id`,
+        `room_id`,
+        `start_time`,
+        `end_time`,
+        `booking_time`,
+        `register_sid`
+    )
+VALUES (
+        'individual',
+        '12345',
+        '201',
+        '2024-06-14',
+        '2024-06-15',
+        '2024-05-29 10:15:00',
+        '1'
+    );
 -- 更新触发器以适应新的 booking 表
 DELIMITER $$
 
@@ -934,6 +953,12 @@ CREATE INDEX idx_checkin_start_time ON checkin (start_time);
 
 CREATE INDEX idx_checkin_end_time ON checkin (end_time);
 
+CREATE INDEX idx_checkin_id ON checkin (checkin_id);
+
+CREATE INDEX idx_room_id ON checkin (room_id);
+
+CREATE INDEX idx_client_or_team_id ON checkin (client_or_team_id);
+
 --创建员工账号
 CREATE USER 'ranxi' @'localhost' IDENTIFIED BY '123456';
 
@@ -956,7 +981,7 @@ CREATE USER 'lucy123' @'localhost' IDENTIFIED BY '123456';
 CREATE USER 'tom123' @'localhost' IDENTIFIED BY '123456';
 
 -- 创建1级权限员工角色
-CREATE ROLE Level1_Staff @'localhost';
+CREATE ROLE Level1_Staff;
 
 -- 1级权限员工角色权限
 GRANT SELECT ON hotelsystemplus.* TO Level1_Staff;
@@ -1016,7 +1041,7 @@ GRANT Level1_Staff TO 'jack123' @'localhost';
 GRANT Level1_Staff TO 'lucy123' @'localhost';
 
 -- 为2级权限员工分配角色
-GRANT Level2_Staff TO 'ranxi' @'%';
+GRANT Level2_Staff TO 'ranxi' @'localhost';
 
 GRANT Level2_Staff TO 'tom123' @'localhost';
 
